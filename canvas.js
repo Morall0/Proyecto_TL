@@ -3,9 +3,9 @@ function transformacionRot3D(coords, a, b, g) {
     let nuevas_coords= JSON.parse(JSON.stringify(coords)); // Se saca la copia de las coordenadas originales.
 
     // Matriz de rotacion que surge a partir de la composicion de las 3 matrices de rotacion
-    const A = [[Math.cos(b)*Math.cos(g), -Math.cos(b)*Math.sin(g), Math.sin(b)],
-             [Math.sin(a)*Math.sin(g)-Math.cos(a)*Math.sin(b)*Math.cos(g), Math.cos(a)*Math.sin(b)*Math.sin(g)+Math.sin(a)*Math.cos(g), Math.cos(a)*Math.cos(b)],
-             [Math.sin(a)*Math.sin(b)*Math.cos(g)+Math.cos(a)*Math.sin(g), Math.cos(a)*Math.cos(g)-Math.sin(a)*Math.sin(b)*Math.sin(g), -Math.sin(a)*Math.cos(b)]];
+    const A = [[Math.cos(g) * Math.cos(b), Math.cos(g) * Math.sin(b) * Math.sin(a) - Math.sin(g) * Math.cos(a), Math.sin(g) * Math.sin(a) + Math.cos(g) * Math.sin(b) * Math.cos(a)],
+               [Math.sin(g) * Math.cos(b), Math.cos(g) * Math.cos(a) + Math.sin(g) * Math.sin(b) * Math.sin(a), Math.sin(g) * Math.sin(b) * Math.cos(a) - Math.cos(g) * Math.sin(a)],
+               [-Math.sin(b), Math.cos(b) * Math.sin(a), Math.cos(b) * Math.cos(a)]];
 
     coords.forEach((B, index) => { // Por cada par de coordenadas...
         for(let n=0; n<A.length; n++) { // Itera filas de matriz A
@@ -50,12 +50,13 @@ const ctx2d = canvas.getContext("2d"); // Obteniendo el contexto (se trabaja en 
 
 // Objeto que almacena las caras del cubo
 let cubo = {
+    // Propiedades que almacenan los vertices del cubo.
     cara_inferior: [[-150, 150, 150],[150, 150, 150],[150, -150, 150],[-150, -150, 150]],
     cara_superior: [[-150, 150, -150],[150, 150, -150],[150, -150, -150],[-150, -150, -150]],
     cara_izquierda: [[-150, 150, 150], [-150, 150, -150], [-150, -150, -150],[-150, -150, 150]],
     cara_derecha: [[150, 150, 150], [150, 150, -150], [150, -150, -150],[150, -150, 150]],
     
-    // Dibuja el cubo con las transformaciones y en R2
+    // Dibuja el cubo con las transformaciones de rotacion y en R2.
     dibujaCubo(ctx, a, b, g) {
         let cara_i = transformacionRot3D(this.cara_inferior, a, b, g);
         let cara_s = transformacionRot3D(this.cara_superior, a, b, g);
@@ -69,33 +70,37 @@ let cubo = {
     }
 }
 
-// Inputs de los angulos
+// Inputs range de los angulos
 const input_a = document.getElementById("alpha"); 
 const input_b = document.getElementById("beta"); 
-const input_g = document.getElementById("gamma"); 
+const input_g = document.getElementById("gamma");
+const labels = document.getElementsByTagName("label");
 
-//Variables que almacenan los angulos
+// Variables que almacenan los angulos.
 let alpha=0;
 let beta=0;
 let gamma=0;
 
-// Se dibuja inicialmente el cubo
+// Se dibuja el cubo en su estado inicial.
 cubo.dibujaCubo(ctx2d, 0, 0, 0);
 
-// Evento del angulo alpha
+// Evento del angulo alpha.
 input_a.addEventListener("input", () => {
     alpha = (input_a.value/180 )* Math.PI; // Obteniendo el angulo y convirtiendolo a radianes
+    labels[0].innerText = `Alpha: ${input_a.value}°`
     cubo.dibujaCubo(ctx2d, alpha, beta, gamma);
 });
 
-// Evento del angulo beta
+// Evento del angulo beta.
 input_b.addEventListener("input", () => {
     beta = (input_b.value/180 )* Math.PI; // Obteniendo el angulo y convirtiendolo a radianes
+    labels[1].innerText = `Beta: ${input_b.value}°`
     cubo.dibujaCubo(ctx2d, alpha, beta, gamma);
 });
 
-// Evento del angulo gamma
+// Evento del angulo gamma.
 input_g.addEventListener("input", () => {
     gamma = (input_g.value/180 )* Math.PI; // Obteniendo el angulo y convirtiendolo a radianes
+    labels[2].innerText = `Gamma: ${input_g.value}°`
     cubo.dibujaCubo(ctx2d, alpha, beta, gamma);
 });
